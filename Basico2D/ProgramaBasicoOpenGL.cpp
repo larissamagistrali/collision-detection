@@ -1,20 +1,14 @@
 // **********************************************************************
-// PUCRS/Escola PolitŽcnica
-// COMPUTA‚ÌO GRçFICA
+// PUCRS/FACIN
+// COMPUTAÇÃO GRÁFICA
 //
-// Programa basico para criar aplicacoes 2D em OpenGL
+// Teste de colisão em OpenGL
 //
 // Marcio Sarroglia Pinho
-// pinho@pucrs.br
+// pinho@inf.pucrs.br
 // **********************************************************************
-
-
-// Para uso no Xcode:
-// Abra o menu Product -> Scheme -> Edit Scheme -> Use custom working directory
-// Selecione a pasta onde voce descompactou o ZIP que continha este arquivo.
-//
-
 #include <iostream>
+#include <iomanip>
 #include <cmath>
 #include <ctime>
 
@@ -25,7 +19,6 @@ using namespace std;
 #include <glut.h>
 #else
 #include <sys/time.h>
-static struct timeval last_idle_time;
 #endif
 
 #ifdef __APPLE__
@@ -36,11 +29,81 @@ static struct timeval last_idle_time;
 #include <glut.h>
 #endif
 
-#include "Temporizador.h"
-Temporizador T;
-double AccumDeltaT=0;
+#include "Ponto.h"
+#include "Linha.h"
 
+const int MAX = 300;
+bool devoTestar = true;
+bool devoExibir = true;
+bool devoImprimirFPS = false;
 
+Linha Linhas[MAX];
+Linha Veiculo;
+
+float tx, ty, alfa;
+void PrintMenu()
+{
+    cout << "f - imprime FPS." << endl;
+    cout << "ESPACO - liga/desliga teste de colisao." << endl;
+}
+// ***********************************************
+// imprime a matriz de transformaçao da OpenGL
+// ***********************************************
+void imprimeMatrizGL()
+{
+
+    GLfloat matriz_gl[4][4];
+
+    glGetFloatv(GL_MODELVIEW_MATRIX,&matriz_gl[0][0]);
+
+    for(int i = 0; i<4; i++)
+    {
+        for(int j=0; j<4; j++)
+        {
+            cout << setw(5) << matriz_gl[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+// ***********************************************
+//  void InstanciaPonto(Ponto p, Ponto &out)
+//
+//  Esta função calcula as coordenadas
+//  de um ponto no sistema de referência do
+//  universo (SRU), ou seja, aplica as rotações,
+//  escalas e translações a um ponto no sistema
+//  de referência do objeto SRO.
+// ***********************************************
+void InstanciaPonto(Ponto p, Ponto &out)
+{
+    GLfloat ponto_novo[4];
+    GLfloat matriz_gl[4][4];
+    int  i;
+
+    glGetFloatv(GL_MODELVIEW_MATRIX,&matriz_gl[0][0]);
+
+    for(i=0; i<4; i++)
+    {
+        ponto_novo[i] = matriz_gl[0][i] * p.x +
+                        matriz_gl[1][i] * p.y +
+                        matriz_gl[2][i] * p.z +
+                        matriz_gl[3][i];
+    }
+    out.x = ponto_novo[0];
+    out.y = ponto_novo[1];
+    out.z = ponto_novo[2];
+
+    //imprimeMatrizGL();
+
+}
+// **********************************************************************
+//
+//
+// **********************************************************************
+void GuardaCoodenadasDoVeiculo()
+{
+
+}
 // **********************************************************************
 //  void init(void)
 //  Inicializa os parâmetros globais de OpenGL
@@ -48,8 +111,23 @@ double AccumDeltaT=0;
 // **********************************************************************
 void init(void)
 {
-	// Define a cor do fundo da tela (AZUL)
-    glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+    // Define a cor do fundo da tela (AZUL)
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+    srand(unsigned(time(NULL)));
+    for(int i=0; i<MAX; i++)
+        //Linhas[i].geraLinha();
+        Linhas[i].geraLinhaCurta();
+    // Define as coordenadas da linha que representa o veículo
+    Veiculo.x1 = 0;
+    Veiculo.y1 = 1.0;
+    Veiculo.x2 = 0;
+    Veiculo.y2 = -1.0;
+
+    // Define a posição inicial da linha que representa o veículo
+    tx = 5;
+    ty = 5;
+    alfa = 0.0;
 
 }
 
@@ -63,56 +141,143 @@ void reshape( int w, int h )
     // Reset the coordinate system before modifying
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    // Define a area a ser ocupada pela área OpenGL dentro da Janela
-    glViewport(0, 0, w, h);
+    // Define os limites lógicos da área OpenGL dentro da Janela
     glOrtho(0,10,0,10,0,1);
 
-    // Define os limites lógicos da área OpenGL dentro da Janela
+    // Define a área a ser ocupada pela área OpenGL dentro da Janela
+    glViewport(0, 0, w, h);
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
 }
 
+/* ********************************************************************** */
+/*                                                                        */
+/*  Calcula a interseccao entre 2 retas (no plano "XY" Z = 0)             */
+/*                                                                        */
+/* k : ponto inicial da reta 1                                            */
+/* l : ponto final da reta 1                                              */
+/* m : ponto inicial da reta 2                                            */
+/* n : ponto final da reta 2                                              */
+/*                                                                        */
+/* s: valor do parâmetro no ponto de interseção (sobre a reta KL)         */
+/* t: valor do parâmetro no ponto de interseção (sobre a reta MN)         */
+/*                                                                        */
+/* ********************************************************************** */
+int intersec2d(Ponto k, Ponto l, Ponto m, Ponto n, double &s, double &t)
+{
+    double det;
+
+    det = (n.x - m.x) * (l.y - k.y)  -  (n.y - m.y) * (l.x - k.x);
+
+    if (det == 0.0)
+        return 0 ; // não há intersecção
+
+    s = ((n.x - m.x) * (m.y - k.y) - (n.y - m.y) * (m.x - k.x))/ det ;
+    t = ((l.x - k.x) * (m.y - k.y) - (l.y - k.y) * (m.x - k.x))/ det ;
+
+    return 1; // há intersecção
+}
+
+bool HaInterseccao(Ponto k, Ponto l, Ponto m, Ponto n)
+{
+    int ret;
+    double s,t;
+    ret = intersec2d( k,  l,  m,  n, s, t);
+    if (!ret) return false;
+    if (s>=0.0 && s <=1.0 && t>=0.0 && t<=1.0)
+        return true;
+    else return false;
+
+}
+void Redesenha(int i)
+{
+    glutPostRedisplay();
+}
+void DesenhaCenario()
+{
+    Ponto P1, P2, PA, PB, temp;
+    // Calcula e armazena as coordenadas da linha que representa o "veículo"
+    glPushMatrix();
+    {
+        glTranslatef(tx, ty, 0);
+        glRotatef(alfa,0,0,1);
+        // guarda as coordenadas do primeiro ponto da linha
+        temp.set(Veiculo.x1, Veiculo.y1);
+        InstanciaPonto(temp, P1);
+        temp.set(Veiculo.x2, Veiculo.y2);
+        InstanciaPonto(temp, P2);
+    }
+    glPopMatrix();
+
+    // Desenha as linhas do cenário
+    glLineWidth(1);
+    glColor3f(1,1,0);
+
+    for(int i=0; i<MAX; i++)
+    {
+        if (devoTestar)   // Esta variável é controlada pela "tecla de espaço"
+        {
+            temp.set(Linhas[i].x1, Linhas[i].y1);
+            InstanciaPonto(temp, PA);
+            temp.set(Linhas[i].x2, Linhas[i].y2);
+            InstanciaPonto(temp, PB);
+            if (HaInterseccao(PA, PB, P1, P2))
+                glColor3f(1,0,0);
+            else glColor3f(0,1,0);
+        }
+        else glColor3f(0,1,0);
+        if (devoExibir) // Esta variável é controlada pela 'e'
+            Linhas[i].desenhaLinha();
+    }
+
+    // Desenha o veículo de novo
+    glColor3f(1,0,1);
+    glLineWidth(3);
+    glPushMatrix();
+    {
+        glTranslatef(tx, ty, 0);
+        glRotatef(alfa,0,0,1);
+        Veiculo.desenhaLinha();
+    }
+    glPopMatrix();
+
+}
 // **********************************************************************
 //  void display( void )
 //
 // **********************************************************************
 void display( void )
 {
-    double dt = T.getDeltaT();
-    AccumDeltaT += dt;
-    if (AccumDeltaT > 3) // imprime o frame rate a cada 3 segundos
-    {
-        AccumDeltaT =0;
-        cout << "FPS: " << 1.0/dt << endl;
-    }
+    float new_time,base_time;
+    // Limpa a tela com  a cor de fundo
+    glClear(GL_COLOR_BUFFER_BIT);
 
-	// Limpa a tela coma cor de fundo
-	glClear(GL_COLOR_BUFFER_BIT);
-
-    // Define os limites lógicos da área OpenGL dentro da Janela
-	glMatrixMode(GL_MODELVIEW);
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	// Coloque aqui as chamadas das rotinas que desenha os objetos
-	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+#define QTD_FRAMES 500.0
 
-	glLineWidth(3);
-	glColor3f(1,0,0);
+    if (devoImprimirFPS) // Pressione f para imprimir
+    {
+        base_time = glutGet(GLUT_ELAPSED_TIME);
 
-	glBegin(GL_LINES);
-	  glVertex2f(0,0);
-	  glVertex2f(5,5);
-	glEnd();
+        for (int i=0; i< QTD_FRAMES;i++) // Repete o desenho do cenario
+            DesenhaCenario();
+        new_time = glutGet(GLUT_ELAPSED_TIME);
 
-	glLineWidth(3);
-	glColor3f(0,1,0);
-	glBegin(GL_LINES);
-	  glVertex2f(5,5);
-	  glVertex2f(10,0);
-	glEnd();
+        float fps;
+        fps = QTD_FRAMES/(new_time - base_time);
 
-	glutSwapBuffers();
+        cout << fps << " FPS." << endl;
+
+        devoImprimirFPS = false;
+    }
+    else DesenhaCenario();
+
+    glutSwapBuffers();
+
 }
 
 
@@ -124,15 +289,34 @@ void display( void )
 void keyboard ( unsigned char key, int x, int y )
 {
 
-	switch ( key )
-	{
-		case 27:        // Termina o programa qdo
-			exit ( 0 );   // a tecla ESC for pressionada
-			break;
-
-		default:
-			break;
-	}
+    switch ( key )
+    {
+    case 27:        // Termina o programa qdo
+        exit ( 0 );   // a tecla ESC for pressionada
+        break;
+    case 'e':
+        devoExibir = !devoExibir;
+        break;
+    case'r':
+        alfa = alfa + 3;
+        break;
+    case'R':
+        alfa = alfa - 3;
+        break;
+    case' ':
+        devoTestar = !devoTestar;
+        if (devoTestar)
+            cout << "Interseccao LIGADA." << endl;
+        else cout << "Interseccao DESLIGADA." << endl;
+        break;
+    case 'f':
+        devoImprimirFPS = true;
+        cout << "Comecou a contar..." << endl;
+        break;
+    default:
+        break;
+    }
+    glutPostRedisplay();
 }
 
 
@@ -143,21 +327,36 @@ void keyboard ( unsigned char key, int x, int y )
 // **********************************************************************
 void arrow_keys ( int a_keys, int x, int y )
 {
-	switch ( a_keys )
-	{
-		case GLUT_KEY_UP:       // Se pressionar UP
-			glutFullScreen ( ); // Vai para Full Screen
-			break;
-	    case GLUT_KEY_DOWN:     // Se pressionar UP
-								// Reposiciona a janela
-            glutPositionWindow (50,50);
-			glutReshapeWindow ( 700, 500 );
-			break;
-		default:
-			break;
-	}
-}
 
+    float incremento=0.2;
+
+    switch ( a_keys )
+    {
+    case GLUT_KEY_UP:       // Se pressionar UP
+        ty += incremento;
+        break;
+    case GLUT_KEY_DOWN:     // Se pressionar DOWN
+        ty -= incremento;
+        break;
+    case GLUT_KEY_LEFT:       // Se pressionar LEFT
+        tx -= incremento;
+        break;
+    case GLUT_KEY_RIGHT:     // Se pressionar RIGHT
+        tx += incremento;
+        break;
+    default:
+        break;
+    }
+    glutPostRedisplay();
+}
+void mouse(int button, int state, int x, int y)
+{
+    glutPostRedisplay();
+}
+void mouseMove(int x, int y)
+{
+    glutPostRedisplay();
+}
 // **********************************************************************
 //  void main ( int argc, char** argv )
 //
@@ -174,22 +373,18 @@ int  main ( int argc, char** argv )
 
     // Cria a janela na tela, definindo o nome da
     // que aparecera na barra de título da janela.
-    glutCreateWindow    ( "Primeiro Programa em OpenGL" );
+    glutCreateWindow    ( "Cálculo de colisão." );
 
     // executa algumas inicializações
     init ();
+
 
     // Define que o tratador de evento para
     // o redesenho da tela. A funcao "display"
     // será chamada automaticamente quando
     // for necessário redesenhar a janela
     glutDisplayFunc ( display );
-
-    // Define que o tratador de evento para
-    // o invalida‹o da tela. A funcao "display"
-    // será chamada automaticamente sempre que a
-    // m‡quina estiver ociosa (idle)
-    glutIdleFunc(display);
+    glutIdleFunc ( display );
 
     // Define que o tratador de evento para
     // o redimensionamento da janela. A funcao "reshape"
@@ -210,7 +405,10 @@ int  main ( int argc, char** argv )
     // automaticamente sempre o usuário
     // pressionar uma tecla especial
     glutSpecialFunc ( arrow_keys );
+    //glutMouseFunc(mouse);
+    //glutMotionFunc(mouseMove);
 
+    PrintMenu();
     // inicia o tratamento dos eventos
     glutMainLoop ( );
 
