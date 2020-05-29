@@ -4,7 +4,6 @@
 #include "gl\glut.h"
 #endif
 
-
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #endif
