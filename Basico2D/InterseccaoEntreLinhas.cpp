@@ -25,23 +25,19 @@ using namespace std;
 //------------------------------------------------------
 
 //VARIAVEIS
-const int MAX =400 ;
+const int MAX = 50;
 bool devoTestar = true;
 bool devoExibir = true;
 bool devoImprimirFPS = false;
 Linha Linhas[MAX];
 Linha Veiculo;
 float tx, ty, alfa;
-int glOrthoX=10,glOrthoY=10;
 
 //MENU
 void PrintMenu()
 {
     cout << "-------------------MENU-------------------" << endl;
-    cout << "-> e - esconde linhas." << endl;
     cout << "-> f - imprime FPS." << endl;
-    cout << "-> r/R - rota veiculo." << endl;
-    cout << "-> setas - movimenta veiculo." << endl;
     cout << "-> ESPACO - liga/desliga teste de colisao." << endl;
     cout << "------------------------------------------" << endl;
 }
@@ -98,34 +94,45 @@ typedef struct Particao{
     std::vector<int> indices;
 };
 
-const int numParticoes=4; //4x4=16 particoes
+const int numParticoes=3.0; //4x4=16 particoes
 Particao Particoes[numParticoes][numParticoes];
 
-int larguraParticao = glOrthoX/numParticoes;
-int alturaParticao  = glOrthoY/numParticoes;
-int contx,conty=0;
+float larguraParticao = 10.0/numParticoes;
+float alturaParticao  = 10.0/numParticoes;
+
+float contx,conty=0.0;
 int i,j=0;
+
 void GeraParticoes(){
+
     for(i = 0; i<numParticoes; i++) {
         vector<int> indicesLinhasDaParticao;
         for(j = 0; j<numParticoes; j++){
+
             Particoes[i][j].xmin=contx;
             Particoes[i][j].ymin=conty;
-            contx=contx+larguraParticao;
-            Particoes[i][j].xmax=contx-0.1;
+            Particoes[i][j].xmax=contx+larguraParticao;
+            Particoes[i][j].ymax=conty+alturaParticao;
 
-            for(int k=0; k<MAX; k++){
-                if((Linhas[k].x1>= Particoes[i][j].xmin && Linhas[k].x2<= Particoes[i][j].xmax)||
-                   (Linhas[k].y1>= Particoes[i][j].ymin && Linhas[k].y2<= Particoes[i][j].ymax)){
+            //printf("XMIN %f YMIN %f", contx, conty);
+
+            contx = contx + larguraParticao;
+
+            //Particoes[i][j].xmax=contx-0.1;
+            //printf("XMAX %f YMAX %f", contx+larguraParticao, conty+alturaParticao);
+
+            //for(int k=0; k<MAX; k++){
+                //if((Linhas[k].x1>= Particoes[i][j].xmin && Linhas[k].x2<= Particoes[i][j].xmax)||
+                   //(Linhas[k].y1>= Particoes[i][j].ymin && Linhas[k].y2<= Particoes[i][j].ymax)){
                     //printf("[%d][%d]-",i,j);
-                    indicesLinhasDaParticao.push_back(k);
-                }
-            }
-            Particoes[i][j].indices=indicesLinhasDaParticao;
+                    //indicesLinhasDaParticao.push_back(k);
+                //}
+            //}
+            //Particoes[i][j].indices=indicesLinhasDaParticao;
         }
-        contx=0;
+        contx=0.0;
         conty=conty+alturaParticao;
-        Particoes[i][j].ymax=conty-0.1;
+        //Particoes[i][j].ymax=conty-0.1;
     }
 }
 
@@ -182,13 +189,10 @@ void DesenhaCenario()
     }
     glPopMatrix();
 
-
     // Desenha as linhas do cenário
     glLineWidth(1);
     glColor3f(1,1,0);
-
-
-    for(int i=0; i<MAX; i++) //ALTERAR AQUI PARA FAZER MENOS TESTES
+    for(int i=0; i<MAX; i++)
     {
         if (devoTestar)   // Esta variável é controlada pela "tecla de espaço"
         {
@@ -215,7 +219,29 @@ void DesenhaCenario()
         Veiculo.desenhaLinha();
     }
     glPopMatrix();
-}
+
+    for(int i=0; i<numParticoes; i++){
+        for(int j=0; j<numParticoes; j++){
+            // Desenha o veículo de novo
+            glColor3f(0,0,1);
+            glLineWidth(4);
+            //glPushMatrix();
+            //{
+                //glTranslatef(tx, ty, 0);
+                //glRotatef(alfa,0,0,1);
+                glBegin(GL_LINE_LOOP);
+                glVertex2f(Particoes[i][j].xmin, Particoes[i][j].ymin);//0,0
+                glVertex2f(Particoes[i][j].xmax, Particoes[i][j].ymin);//10,0
+                glVertex2f(Particoes[i][j].xmax, Particoes[i][j].ymax);//10,10
+                glVertex2f(Particoes[i][j].xmin, Particoes[i][j].ymax);//0,10
+
+                glEnd();
+            //}
+            //glPopMatrix();
+        }
+    }
+
+    }
 
 //DISPLAY
 void display( void )
@@ -325,6 +351,7 @@ void init(void)
     tx = 5;
     ty = 5;
     alfa = 0.0;
+
     GeraParticoes();
 }
 
@@ -335,7 +362,7 @@ void reshape( int w, int h )
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     // Define os limites lógicos da área OpenGL dentro da Janela
-    glOrtho(0,glOrthoX,0,glOrthoY,0,1);
+    glOrtho(0,10,0,10,0,1);
     // Define a área a ser ocupada pela área OpenGL dentro da Janela
     glViewport(0, 0, w, h);
     glMatrixMode(GL_MODELVIEW);

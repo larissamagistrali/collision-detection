@@ -236,3 +236,51 @@
 	"gl\glut.h"
 	<GLUT/glut.h>
 
+1591041906 source:/home/nikolas/Desktop/last/CG-DeteccaoDeColisao/Basico2D/InterseccaoEntreLinhas.cpp
+	<iostream>
+	<iomanip>
+	<cmath>
+	<ctime>
+	<windows.h>
+	<glut.h>
+	<sys/time.h>
+	<GLUT/glut.h>
+	<glut.h>
+	"Ponto.h"
+	"Linha.h"
+	<vector>
+
+1591041844 /home/nikolas/Desktop/last/CG-DeteccaoDeColisao/Basico2D/GL/glut.h
+	"freeglut.h"
+
+1591041844 /home/nikolas/Desktop/last/CG-DeteccaoDeColisao/Basico2D/GL/freeglut.h
+	"freeglut_std.h"
+	"freeglut_ext.h"
+
+1591041844 /home/nikolas/Desktop/last/CG-DeteccaoDeColisao/Basico2D/GL/freeglut_std.h
+	<windows.h>
+	<GL/gl.h>
+	<GL/glu.h>
+
+1591041844 /home/nikolas/Desktop/last/CG-DeteccaoDeColisao/Basico2D/GL/freeglut_ext.h
+
+1591041844 /home/nikolas/Desktop/last/CG-DeteccaoDeColisao/Basico2D/Ponto.h
+
+1591041844 /home/nikolas/Desktop/last/CG-DeteccaoDeColisao/Basico2D/Linha.h
+	<windows.h>
+	"gl\glut.h"
+	<GLUT/glut.h>
+
+1591041946 source:/home/nikolas/Desktop/last/CG-DeteccaoDeColisao/Basico2D/Linha.cpp
+	<cstdlib>
+	<iostream>
+	<iomanip>
+	<cmath>
+	<ctime>
+	<windows.h>
+	<glut.h>
+	<sys/time.h>
+	<GLUT/glut.h>
+	<glut.h>
+	"Linha.h"
+
