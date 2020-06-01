@@ -215,7 +215,7 @@
 1590688276 source:c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\temporizador.cpp
 	"Temporizador.h"
 
-1590688276 source:c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\interseccaoentrelinhas.cpp
+1590968491 source:c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\interseccaoentrelinhas.cpp
 	<iostream>
 	<iomanip>
 	<cmath>
@@ -227,10 +227,11 @@
 	<glut.h>
 	"Ponto.h"
 	"Linha.h"
+	<vector>
 
 1590688276 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\ponto.h
 
-1590688276 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\linha.h
+1590966180 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\linha.h
 	<windows.h>
 	"gl\glut.h"
 	<GLUT/glut.h>

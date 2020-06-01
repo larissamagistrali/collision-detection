@@ -64,11 +64,7 @@
 		<Unit filename="InterseccaoEntreLinhas.cpp" />
 		<Unit filename="Linha.cpp" />
 		<Unit filename="Linha.h" />
-		<Unit filename="Linha.o" />
 		<Unit filename="Ponto.h" />
-		<Unit filename="ProgramaBasicoOpenGL.cpp" />
-		<Unit filename="Temporizador.cpp" />
-		<Unit filename="Temporizador.h" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
