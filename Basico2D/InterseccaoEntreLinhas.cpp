@@ -188,33 +188,36 @@ void DesenhaCenario()
     //printf("VEICULO X1 %f Y1 %f\n", Veiculo.x2, Veiculo.y2);
     //printf("VEICULO tx %f ty %f\n", tx, ty);
 
-    for(int i=0; i<numParticoes; i++){
-        for(int j=0; j<numParticoes; j++){
-            if((P2.x >= Particoes[i][j].xmin && P2.x <= Particoes[i][j].xmax && P2.y >= Particoes[i][j].ymin && P2.y <= Particoes[i][j].ymax)||
-               (P1.x >= Particoes[i][j].xmin && P1.x <= Particoes[i][j].xmax && P1.y >= Particoes[i][j].ymin && P1.y <= Particoes[i][j].ymax)){
-                //CASO O VEICULO ESTEJA NESSE SUBESPAÇO
-                printf("MOTORISTA NO QUADRANTE I  %d J %d\n", i, j);
-                for(int k=0; k<Particoes[i][j].indices.size(); k++){
-                        temp.set(Linhas[Particoes[i][j].indices[k]].x1, Linhas[Particoes[i][j].indices[k]].y1);
-                        InstanciaPonto(temp, PA);
-                        temp.set(Linhas[Particoes[i][j].indices[k]].x2, Linhas[Particoes[i][j].indices[k]].y2);
-                        InstanciaPonto(temp, PB);
-                        if (HaInterseccao(PA, PB, P1, P2)){
-                            glColor3f(1,0,0);
-                        }else{
-                            glColor3f(0,1,0);
-                        }
-                        Linhas[Particoes[i][j].indices[k]].desenhaLinha();
-                }
-            }else{
-                glColor3f(0,1,0);
-                for(int k=0; k<Particoes[i][j].indices.size(); k++){
-                    Linhas[Particoes[i][j].indices[k]].desenhaLinha();
+    if(devoExibir){
+        for(int i=0; i<MAX; i++){
+            glColor3f(0,1,0);
+            Linhas[i].desenhaLinha();
+        }
+    }
+
+    if(devoTestar){
+        for(int i=0; i<numParticoes; i++){
+            for(int j=0; j<numParticoes; j++){
+                if((P2.x >= Particoes[i][j].xmin && P2.x <= Particoes[i][j].xmax && P2.y >= Particoes[i][j].ymin && P2.y <= Particoes[i][j].ymax)||
+                   (P1.x >= Particoes[i][j].xmin && P1.x <= Particoes[i][j].xmax && P1.y >= Particoes[i][j].ymin && P1.y <= Particoes[i][j].ymax)){
+                    //CASO O VEICULO ESTEJA NESSE SUBESPAÇO
+                    printf("MOTORISTA NO QUADRANTE I  %d J %d\n", i, j);
+                    for(int k=0; k<Particoes[i][j].indices.size(); k++){
+                            temp.set(Linhas[Particoes[i][j].indices[k]].x1, Linhas[Particoes[i][j].indices[k]].y1);
+                            InstanciaPonto(temp, PA);
+                            temp.set(Linhas[Particoes[i][j].indices[k]].x2, Linhas[Particoes[i][j].indices[k]].y2);
+                            InstanciaPonto(temp, PB);
+                            if (HaInterseccao(PA, PB, P1, P2)){
+                                if(devoExibir){
+                                    glColor3f(1,0,0);
+                                    Linhas[Particoes[i][j].indices[k]].desenhaLinha();
+                                }
+                            }
+                    }
                 }
             }
         }
     }
-
     // Desenha o veículo de novo
     glColor3f(1,0,1);
     glLineWidth(1);
