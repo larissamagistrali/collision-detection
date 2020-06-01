@@ -32,12 +32,16 @@ bool devoImprimirFPS = false;
 Linha Linhas[MAX];
 Linha Veiculo;
 float tx, ty, alfa;
+float glOrthoX=10,glOrthoY=10;
 
 //MENU
 void PrintMenu()
 {
     cout << "-------------------MENU-------------------" << endl;
+    cout << "-> e - esconde linhas." << endl;
     cout << "-> f - imprime FPS." << endl;
+    cout << "-> r/R - rota veiculo." << endl;
+    cout << "-> setas - movimenta veiculo." << endl;
     cout << "-> ESPACO - liga/desliga teste de colisao." << endl;
     cout << "------------------------------------------" << endl;
 }
@@ -82,12 +86,6 @@ void InstanciaPonto(Ponto p, Ponto &out)
     //imprimeMatrizGL();
 }
 
-//COORDENADAS VEICULO
-void GuardaCoodenadasDoVeiculo()
-{
-
-}
-
 //PARTICOES
 typedef struct Particao{
     float xmin,xmax,ymin,ymax;
@@ -97,14 +95,13 @@ typedef struct Particao{
 const int numParticoes=3.0; //4x4=16 particoes
 Particao Particoes[numParticoes][numParticoes];
 
-float larguraParticao = 10.0/numParticoes;
-float alturaParticao  = 10.0/numParticoes;
+float larguraParticao = glOrthoX/numParticoes;
+float alturaParticao  = glOrthoY/numParticoes;
 
 float contx,conty=0.0;
 int i,j=0;
 
 void GeraParticoes(){
-
     for(i = 0; i<numParticoes; i++) {
         vector<int> indicesLinhasDaParticao;
         for(j = 0; j<numParticoes; j++){
@@ -362,7 +359,7 @@ void reshape( int w, int h )
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     // Define os limites lógicos da área OpenGL dentro da Janela
-    glOrtho(0,10,0,10,0,1);
+    glOrtho(0,glOrthoX,0,glOrthoY,0,1);
     // Define a área a ser ocupada pela área OpenGL dentro da Janela
     glViewport(0, 0, w, h);
     glMatrixMode(GL_MODELVIEW);
