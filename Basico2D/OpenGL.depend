@@ -178,7 +178,18 @@
 1584988348 source:c:\users\laris\downloads\cg-deteccaodecolisao\basico2d\temporizador.cpp
 	"Temporizador.h"
 
-1590688276 source:c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\linha.cpp
+1591042230 source:c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\linha.cpp
+	<cstdlib>
+	<iostream>
+	<iomanip>
+	<cmath>
+	<ctime>
+	<windows.h>
+	<glut.h>
+	<sys/time.h>
+	<GLUT/glut.h>
+	<glut.h>
+	"Linha.h"
 
 1590688600 source:c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\programabasicoopengl.cpp
 	<iostream>
@@ -193,19 +204,19 @@
 	"Ponto.h"
 	"Linha.h"
 
-1590688276 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\gl\glut.h
+1591042230 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\gl\glut.h
 	"freeglut.h"
 
-1590688276 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\gl\freeglut.h
+1591042230 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\gl\freeglut.h
 	"freeglut_std.h"
 	"freeglut_ext.h"
 
-1590688276 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\gl\freeglut_std.h
+1591042230 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\gl\freeglut_std.h
 	<windows.h>
 	<GL/gl.h>
 	<GL/glu.h>
 
-1590688276 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\gl\freeglut_ext.h
+1591042230 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\gl\freeglut_ext.h
 
 1590688277 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\temporizador.h
 	<iostream>
@@ -215,7 +226,7 @@
 1590688276 source:c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\temporizador.cpp
 	"Temporizador.h"
 
-1590968491 source:c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\interseccaoentrelinhas.cpp
+1591043559 source:c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\interseccaoentrelinhas.cpp
 	<iostream>
 	<iomanip>
 	<cmath>
@@ -229,14 +240,14 @@
 	"Linha.h"
 	<vector>
 
-1590688276 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\ponto.h
+1591042230 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\ponto.h
 
-1590966180 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\linha.h
+1591042230 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\linha.h
 	<windows.h>
 	"gl\glut.h"
 	<GLUT/glut.h>
 
-1591046293 source:/home/nikolas/Desktop/last/CG-DeteccaoDeColisao/Basico2D/InterseccaoEntreLinhas.cpp
+1591046869 source:/home/nikolas/Desktop/last/CG-DeteccaoDeColisao/Basico2D/InterseccaoEntreLinhas.cpp
 	<iostream>
 	<iomanip>
 	<cmath>

@@ -38,7 +38,10 @@ float glOrthoX=10,glOrthoY=10;
 void PrintMenu()
 {
     cout << "-------------------MENU-------------------" << endl;
+    cout << "-> e - esconde linhas." << endl;
     cout << "-> f - imprime FPS." << endl;
+    cout << "-> r/R - rota veiculo." << endl;
+    cout << "-> setas - movimenta veiculo." << endl;
     cout << "-> ESPACO - liga/desliga teste de colisao." << endl;
     cout << "------------------------------------------" << endl;
 }
@@ -81,12 +84,6 @@ void InstanciaPonto(Ponto p, Ponto &out)
     out.y = ponto_novo[1];
     out.z = ponto_novo[2];
     //imprimeMatrizGL();
-}
-
-//COORDENADAS VEICULO
-void GuardaCoodenadasDoVeiculo()
-{
-
 }
 
 //PARTICOES
