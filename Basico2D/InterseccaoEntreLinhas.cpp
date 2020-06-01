@@ -25,7 +25,7 @@ using namespace std;
 //------------------------------------------------------
 
 //VARIAVEIS
-const int MAX = 5;
+const int MAX = 1500;
 bool devoTestar = true;
 bool devoExibir = true;
 bool devoImprimirFPS = false;
@@ -92,7 +92,7 @@ typedef struct Particao{
     std::vector<int> indices;
 };
 
-const int numParticoes=3.0; //4x4=16 particoes
+const int numParticoes=2.0; //4x4=16 particoes
 Particao Particoes[numParticoes][numParticoes];
 
 float larguraParticao = glOrthoX/numParticoes;
@@ -113,9 +113,8 @@ void GeraParticoes(){
             contx = contx + larguraParticao;
 
             for(int k=0; k<MAX; k++){
-                if((Linhas[k].x1 >= Particoes[i][j].xmin && Linhas[k].x1 <= Particoes[i][j].xmax && Linhas[k].y1 >= Particoes[i][j].ymin && Linhas[k].y1 <= Particoes[i][j].ymax)||
+                if((Linhas[k].x1 >= Particoes[i][j].xmin && Linhas[k].x1 <= Particoes[i][j].xmax && Linhas[k].y1 >= Particoes[i][j].ymin && Linhas[k].y1 <= Particoes[i][j].ymax) ||
                    (Linhas[k].x2 >= Particoes[i][j].xmin && Linhas[k].x2 <= Particoes[i][j].xmax && Linhas[k].y2 >= Particoes[i][j].ymin && Linhas[k].y2 <= Particoes[i][j].ymax)){
-                    //printf("[%d][%d]-",i,j);
                     indicesLinhasDaParticao.push_back(k);
                 }
             }
@@ -123,7 +122,6 @@ void GeraParticoes(){
         }
         contx=0.0;
         conty=conty+alturaParticao;
-        //Particoes[i][j].ymax=conty-0.1;
     }
 }
 
@@ -172,9 +170,11 @@ void DesenhaCenario()
     {
         glTranslatef(tx, ty, 0);
         glRotatef(alfa,0,0,1);
+
         // guarda as coordenadas do primeiro ponto da linha
         temp.set(Veiculo.x1, Veiculo.y1);
         InstanciaPonto(temp, P1);
+
         temp.set(Veiculo.x2, Veiculo.y2);
         InstanciaPonto(temp, P2);
     }
@@ -183,26 +183,41 @@ void DesenhaCenario()
     // Desenha as linhas do cenário
     glLineWidth(1);
     glColor3f(1,1,0);
-    for(int i=0; i<MAX; i++)
-    {
-        if (devoTestar)   // Esta variável é controlada pela "tecla de espaço"
-        {
-            temp.set(Linhas[i].x1, Linhas[i].y1);
-            InstanciaPonto(temp, PA);
-            temp.set(Linhas[i].x2, Linhas[i].y2);
-            InstanciaPonto(temp, PB);
-            if (HaInterseccao(PA, PB, P1, P2))
-                glColor3f(1,0,0);
-            else glColor3f(0,1,0);
+
+    //printf("VEICULO X1 %f Y1 %f\n", Veiculo.x1, Veiculo.y1);
+    //printf("VEICULO X1 %f Y1 %f\n", Veiculo.x2, Veiculo.y2);
+    //printf("VEICULO tx %f ty %f\n", tx, ty);
+
+    for(int i=0; i<numParticoes; i++){
+        for(int j=0; j<numParticoes; j++){
+            if((P2.x >= Particoes[i][j].xmin && P2.x <= Particoes[i][j].xmax && P2.y >= Particoes[i][j].ymin && P2.y <= Particoes[i][j].ymax)||
+               (P1.x >= Particoes[i][j].xmin && P1.x <= Particoes[i][j].xmax && P1.y >= Particoes[i][j].ymin && P1.y <= Particoes[i][j].ymax)){
+                //CASO O VEICULO ESTEJA NESSE SUBESPAÇO
+                printf("MOTORISTA NO QUADRANTE I  %d J %d\n", i, j);
+                for(int k=0; k<Particoes[i][j].indices.size(); k++){
+                        temp.set(Linhas[Particoes[i][j].indices[k]].x1, Linhas[Particoes[i][j].indices[k]].y1);
+                        InstanciaPonto(temp, PA);
+                        temp.set(Linhas[Particoes[i][j].indices[k]].x2, Linhas[Particoes[i][j].indices[k]].y2);
+                        InstanciaPonto(temp, PB);
+                        if (HaInterseccao(PA, PB, P1, P2)){
+                            glColor3f(1,0,0);
+                        }else{
+                            glColor3f(0,1,0);
+                        }
+                        Linhas[Particoes[i][j].indices[k]].desenhaLinha();
+                }
+            }else{
+                glColor3f(0,1,0);
+                for(int k=0; k<Particoes[i][j].indices.size(); k++){
+                    Linhas[Particoes[i][j].indices[k]].desenhaLinha();
+                }
+            }
         }
-        else glColor3f(0,1,0);
-        if (devoExibir) // Esta variável é controlada pela 'e'
-            Linhas[i].desenhaLinha();
     }
 
     // Desenha o veículo de novo
     glColor3f(1,0,1);
-    glLineWidth(3);
+    glLineWidth(1);
     glPushMatrix();
     {
         glTranslatef(tx, ty, 0);
@@ -211,26 +226,22 @@ void DesenhaCenario()
     }
     glPopMatrix();
 
+
     for(int i=0; i<numParticoes; i++){
         for(int j=0; j<numParticoes; j++){
-            // Desenha o veículo de novo
+            // Cada Quadrante
             glColor3f(0,0,1);
-            glLineWidth(4);
-            //glPushMatrix();
-            //{
-                //glTranslatef(tx, ty, 0);
-                //glRotatef(alfa,0,0,1);
-                glBegin(GL_LINE_LOOP);
-                glVertex2f(Particoes[i][j].xmin, Particoes[i][j].ymin);//0,0
-                glVertex2f(Particoes[i][j].xmax, Particoes[i][j].ymin);//10,0
-                glVertex2f(Particoes[i][j].xmax, Particoes[i][j].ymax);//10,10
-                glVertex2f(Particoes[i][j].xmin, Particoes[i][j].ymax);//0,10
-
-                glEnd();
-            //}
-            //glPopMatrix();
+            glLineWidth(1);
+            glBegin(GL_LINE_LOOP);
+            glVertex2f(Particoes[i][j].xmin, Particoes[i][j].ymin);
+            glVertex2f(Particoes[i][j].xmax, Particoes[i][j].ymin);
+            glVertex2f(Particoes[i][j].xmax, Particoes[i][j].ymax);
+            glVertex2f(Particoes[i][j].xmin, Particoes[i][j].ymax);
+            glEnd();
         }
     }
+
+
 
     }
 
@@ -238,12 +249,13 @@ void DesenhaCenario()
 void display( void )
 {
     float new_time,base_time;
+
     // Limpa a tela com  a cor de fundo
     glClear(GL_COLOR_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-#define QTD_FRAMES 500.0
+    #define QTD_FRAMES 500.0
 
     if (devoImprimirFPS) // Pressione f para imprimir
     {
@@ -256,6 +268,7 @@ void display( void )
         cout << fps << " FPS." << endl;
         devoImprimirFPS = false;
     }
+
     else DesenhaCenario();
     glutSwapBuffers();
 }
@@ -295,7 +308,7 @@ void keyboard ( unsigned char key, int x, int y )
 }
 void arrow_keys ( int a_keys, int x, int y )
 {
-    float incremento=0.2;
+    float incremento=0.1;
     switch ( a_keys )
     {
     case GLUT_KEY_UP:       // Se pressionar UP

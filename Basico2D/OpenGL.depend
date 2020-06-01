@@ -247,7 +247,7 @@
 	"gl\glut.h"
 	<GLUT/glut.h>
 
-1591046869 source:/home/nikolas/Desktop/last/CG-DeteccaoDeColisao/Basico2D/InterseccaoEntreLinhas.cpp
+1591049651 source:/home/nikolas/Desktop/last/CG-DeteccaoDeColisao/Basico2D/InterseccaoEntreLinhas.cpp
 	<iostream>
 	<iomanip>
 	<cmath>
