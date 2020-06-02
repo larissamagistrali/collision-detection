@@ -25,9 +25,10 @@ using namespace std;
 //------------------------------------------------------
 
 //VARIAVEIS
-const int MAX = 1500;
+const int MAX = 2500;
 bool devoTestar = true;
 bool devoExibir = true;
+bool desenhaSubespacos = false;
 bool devoImprimirFPS = false;
 Linha Linhas[MAX];
 Linha Veiculo;
@@ -92,38 +93,6 @@ typedef struct Particao{
     std::vector<int> indices;
 };
 
-const int numParticoes=2.0; //4x4=16 particoes
-Particao Particoes[numParticoes][numParticoes];
-
-float larguraParticao = glOrthoX/numParticoes;
-float alturaParticao  = glOrthoY/numParticoes;
-
-float contx,conty=0.0;
-int i,j=0;
-
-void GeraParticoes(){
-    for(i = 0; i<numParticoes; i++) {
-        for(j = 0; j<numParticoes; j++){
-            vector<int> indicesLinhasDaParticao;
-            Particoes[i][j].xmin=contx;
-            Particoes[i][j].ymin=conty;
-            Particoes[i][j].xmax=contx+larguraParticao;
-            Particoes[i][j].ymax=conty+alturaParticao;
-
-            contx = contx + larguraParticao;
-
-            for(int k=0; k<MAX; k++){
-                if((Linhas[k].x1 >= Particoes[i][j].xmin && Linhas[k].x1 <= Particoes[i][j].xmax && Linhas[k].y1 >= Particoes[i][j].ymin && Linhas[k].y1 <= Particoes[i][j].ymax) ||
-                   (Linhas[k].x2 >= Particoes[i][j].xmin && Linhas[k].x2 <= Particoes[i][j].xmax && Linhas[k].y2 >= Particoes[i][j].ymin && Linhas[k].y2 <= Particoes[i][j].ymax)){
-                    indicesLinhasDaParticao.push_back(k);
-                }
-            }
-            Particoes[i][j].indices=indicesLinhasDaParticao;
-        }
-        contx=0.0;
-        conty=conty+alturaParticao;
-    }
-}
 
 //INTERSECCAO
 int intersec2d(Ponto k, Ponto l, Ponto m, Ponto n, double &s, double &t)
@@ -146,6 +115,7 @@ int intersec2d(Ponto k, Ponto l, Ponto m, Ponto n, double &s, double &t)
     t = ((l.x - k.x) * (m.y - k.y) - (l.y - k.y) * (m.x - k.x))/ det ;
     return 1; // há intersecção
 }
+
 bool HaInterseccao(Ponto k, Ponto l, Ponto m, Ponto n)
 {
     int ret;
@@ -156,6 +126,68 @@ bool HaInterseccao(Ponto k, Ponto l, Ponto m, Ponto n)
         return true;
     else return false;
 }
+
+bool linhaEstaDentroDoSubespaco(float x1Linha, float y1Linha, float x2Linha, float y2Linha, float xMin, float yMin, float xMax, float yMax){
+    //Esta funcao verifica se uma linha está dentro de um subespaco
+    if((x1Linha >= xMin && x1Linha <= xMax && y1Linha >= yMin && y1Linha <= yMax) ||
+       (x2Linha >= xMin && x2Linha <= xMax && y2Linha >= yMin && y2Linha <= yMax)){
+        return true;
+    }
+    return false;
+}
+
+bool linhaIntersectaSubespaco(float x1Linha, float y1Linha, float x2Linha, float y2Linha, float xMin, float yMin, float xMax, float yMax){
+    //Esta funcao verifica se uma linha intersecta um subespaco
+    Ponto inicioLinha, finalLinha, cantoSubespaco1, cantoSubespaco2, cantoSubespaco3, cantoSubespaco4;
+    inicioLinha.set(x1Linha, y1Linha);
+    finalLinha.set(x2Linha, y2Linha);
+    cantoSubespaco1.set(xMin, yMin);
+    cantoSubespaco2.set(xMax, yMin);
+    cantoSubespaco3.set(xMin, yMax);
+    cantoSubespaco4.set(xMax, yMax);
+
+    if(HaInterseccao(inicioLinha, finalLinha, cantoSubespaco1, cantoSubespaco2) ||
+       HaInterseccao(inicioLinha, finalLinha, cantoSubespaco2, cantoSubespaco4) ||
+       HaInterseccao(inicioLinha, finalLinha, cantoSubespaco1, cantoSubespaco3) ||
+       HaInterseccao(inicioLinha, finalLinha, cantoSubespaco3, cantoSubespaco4)){
+        return true;
+    }
+    return false;
+}
+
+const int numParticoes=12.0; //4x4=16 particoes
+Particao Particoes[numParticoes][numParticoes];
+
+float larguraParticao = glOrthoX/numParticoes;
+float alturaParticao  = glOrthoY/numParticoes;
+
+float contx,conty=0.0;
+int i,j=0;
+
+void GeraParticoes(){
+    for(i = 0; i<numParticoes; i++) {
+        for(j = 0; j<numParticoes; j++){
+            vector<int> indicesLinhasDaParticao;
+            Particoes[i][j].xmin=contx;
+            Particoes[i][j].ymin=conty;
+            Particoes[i][j].xmax=contx+larguraParticao;
+            Particoes[i][j].ymax=conty+alturaParticao;
+
+            contx = contx + larguraParticao;
+
+            for(int k=0; k<MAX; k++){
+                if(linhaEstaDentroDoSubespaco(Linhas[k].x1, Linhas[k].y1, Linhas[k].x2, Linhas[k].y2, Particoes[i][j].xmin, Particoes[i][j].ymin, Particoes[i][j].xmax,Particoes[i][j].ymax) ||
+                   linhaIntersectaSubespaco(Linhas[k].x1, Linhas[k].y1, Linhas[k].x2, Linhas[k].y2, Particoes[i][j].xmin, Particoes[i][j].ymin, Particoes[i][j].xmax,Particoes[i][j].ymax)){
+                    indicesLinhasDaParticao.push_back(k);
+                }
+            }
+            Particoes[i][j].indices=indicesLinhasDaParticao;
+        }
+        contx=0.0;
+        conty=conty+alturaParticao;
+    }
+}
+
 
 //DESENHOS
 void Redesenha(int i)
@@ -198,10 +230,9 @@ void DesenhaCenario()
     if(devoTestar){
         for(int i=0; i<numParticoes; i++){
             for(int j=0; j<numParticoes; j++){
-                if((P2.x >= Particoes[i][j].xmin && P2.x <= Particoes[i][j].xmax && P2.y >= Particoes[i][j].ymin && P2.y <= Particoes[i][j].ymax)||
-                   (P1.x >= Particoes[i][j].xmin && P1.x <= Particoes[i][j].xmax && P1.y >= Particoes[i][j].ymin && P1.y <= Particoes[i][j].ymax)){
+                if(linhaEstaDentroDoSubespaco(P1.x, P1.y, P2.x, P2.y, Particoes[i][j].xmin, Particoes[i][j].ymin, Particoes[i][j].xmax, Particoes[i][j].ymax)||
+                   linhaIntersectaSubespaco(P1.x, P1.y, P2.x, P2.y, Particoes[i][j].xmin, Particoes[i][j].ymin, Particoes[i][j].xmax, Particoes[i][j].ymax)){
                     //CASO O VEICULO ESTEJA NESSE SUBESPAÇO
-                    printf("MOTORISTA NO QUADRANTE I  %d J %d\n", i, j);
                     for(int k=0; k<Particoes[i][j].indices.size(); k++){
                             temp.set(Linhas[Particoes[i][j].indices[k]].x1, Linhas[Particoes[i][j].indices[k]].y1);
                             InstanciaPonto(temp, PA);
@@ -229,24 +260,22 @@ void DesenhaCenario()
     }
     glPopMatrix();
 
-
-    for(int i=0; i<numParticoes; i++){
-        for(int j=0; j<numParticoes; j++){
-            // Cada Quadrante
-            glColor3f(0,0,1);
-            glLineWidth(1);
-            glBegin(GL_LINE_LOOP);
-            glVertex2f(Particoes[i][j].xmin, Particoes[i][j].ymin);
-            glVertex2f(Particoes[i][j].xmax, Particoes[i][j].ymin);
-            glVertex2f(Particoes[i][j].xmax, Particoes[i][j].ymax);
-            glVertex2f(Particoes[i][j].xmin, Particoes[i][j].ymax);
-            glEnd();
+    if(desenhaSubespacos){
+        for(int i=0; i<numParticoes; i++){
+            for(int j=0; j<numParticoes; j++){
+                // Cada Quadrante
+                glColor3f(0,0,1);
+                glLineWidth(1);
+                glBegin(GL_LINE_LOOP);
+                glVertex2f(Particoes[i][j].xmin, Particoes[i][j].ymin);
+                glVertex2f(Particoes[i][j].xmax, Particoes[i][j].ymin);
+                glVertex2f(Particoes[i][j].xmax, Particoes[i][j].ymax);
+                glVertex2f(Particoes[i][j].xmin, Particoes[i][j].ymax);
+                glEnd();
+            }
         }
     }
-
-
-
-    }
+}
 
 //DISPLAY
 void display( void )
@@ -293,6 +322,12 @@ void keyboard ( unsigned char key, int x, int y )
         break;
     case'R':
         alfa = alfa - 3;
+        break;
+    case 's':
+        desenhaSubespacos = !desenhaSubespacos;
+        if (desenhaSubespacos)
+             cout << "Desenho dos subespaços LIGADO." << endl;
+        else cout << "Desenho dos subespaços DESLIGADO." << endl;
         break;
     case' ':
         devoTestar = !devoTestar;
@@ -360,14 +395,6 @@ void init(void)
     alfa = 0.0;
 
     GeraParticoes();
-
-
-    for(int i = 0; i<numParticoes; i++) {
-        for(int j = 0; j<numParticoes; j++){
-            printf("I %d J %d\n", i, j);
-            printf("linhas = %d\n", Particoes[i][j].indices.size());
-        }
-    }
 }
 
 //RESHAPE
