@@ -178,7 +178,7 @@
 1584988348 source:c:\users\laris\downloads\cg-deteccaodecolisao\basico2d\temporizador.cpp
 	"Temporizador.h"
 
-1591042230 source:c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\linha.cpp
+1591059332 source:c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\linha.cpp
 	<cstdlib>
 	<iostream>
 	<iomanip>
@@ -204,19 +204,19 @@
 	"Ponto.h"
 	"Linha.h"
 
-1591042230 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\gl\glut.h
+1591059332 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\gl\glut.h
 	"freeglut.h"
 
-1591042230 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\gl\freeglut.h
+1591059332 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\gl\freeglut.h
 	"freeglut_std.h"
 	"freeglut_ext.h"
 
-1591042230 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\gl\freeglut_std.h
+1591059332 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\gl\freeglut_std.h
 	<windows.h>
 	<GL/gl.h>
 	<GL/glu.h>
 
-1591042230 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\gl\freeglut_ext.h
+1591059332 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\gl\freeglut_ext.h
 
 1590688277 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\temporizador.h
 	<iostream>
@@ -226,7 +226,7 @@
 1590688276 source:c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\temporizador.cpp
 	"Temporizador.h"
 
-1591043559 source:c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\interseccaoentrelinhas.cpp
+1591059332 source:c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\interseccaoentrelinhas.cpp
 	<iostream>
 	<iomanip>
 	<cmath>
@@ -240,9 +240,9 @@
 	"Linha.h"
 	<vector>
 
-1591042230 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\ponto.h
+1591059332 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\ponto.h
 
-1591042230 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\linha.h
+1591059332 c:\users\laris\onedrive\햞ea de trabalho\github\cg-deteccaodecolisao\basico2d\linha.h
 	<windows.h>
 	"gl\glut.h"
 	<GLUT/glut.h>

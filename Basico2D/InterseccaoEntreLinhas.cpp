@@ -25,7 +25,7 @@ using namespace std;
 //------------------------------------------------------
 
 //VARIAVEIS
-const int MAX = 2500;
+const int MAX = 1000;
 bool devoTestar = true;
 bool devoExibir = true;
 bool desenhaSubespacos = false;
@@ -40,6 +40,7 @@ void PrintMenu()
 {
     cout << "-------------------MENU-------------------" << endl;
     cout << "-> e - esconde linhas." << endl;
+    cout << "-> s - desenha subespacos." << endl;
     cout << "-> f - imprime FPS." << endl;
     cout << "-> r/R - rota veiculo." << endl;
     cout << "-> setas - movimenta veiculo." << endl;
@@ -115,7 +116,6 @@ int intersec2d(Ponto k, Ponto l, Ponto m, Ponto n, double &s, double &t)
     t = ((l.x - k.x) * (m.y - k.y) - (l.y - k.y) * (m.x - k.x))/ det ;
     return 1; // há intersecção
 }
-
 bool HaInterseccao(Ponto k, Ponto l, Ponto m, Ponto n)
 {
     int ret;
@@ -155,7 +155,8 @@ bool linhaIntersectaSubespaco(float x1Linha, float y1Linha, float x2Linha, float
     return false;
 }
 
-const int numParticoes=12.0; //4x4=16 particoes
+//PARTICOES
+const int numParticoes=12.0; //Ex: 4x4=16 particoes
 Particao Particoes[numParticoes][numParticoes];
 
 float larguraParticao = glOrthoX/numParticoes;
@@ -194,7 +195,7 @@ void Redesenha(int i)
 {
     glutPostRedisplay();
 }
-void DesenhaCenario()
+void DesenhaCenarioOtimizado()
 {
     Ponto P1, P2, PA, PB, temp;
     // Calcula e armazena as coordenadas da linha que representa o "veículo"
@@ -276,6 +277,55 @@ void DesenhaCenario()
         }
     }
 }
+void DesenhaCenarioNaoOtimizado()
+{
+    Ponto P1, P2, PA, PB, temp;
+    // Calcula e armazena as coordenadas da linha que representa o "veículo"
+    glPushMatrix();
+    {
+        glTranslatef(tx, ty, 0);
+        glRotatef(alfa,0,0,1);
+        // guarda as coordenadas do primeiro ponto da linha
+        temp.set(Veiculo.x1, Veiculo.y1);
+        InstanciaPonto(temp, P1);
+        temp.set(Veiculo.x2, Veiculo.y2);
+        InstanciaPonto(temp, P2);
+    }
+    glPopMatrix();
+
+    // Desenha as linhas do cenário
+    glLineWidth(1);
+    glColor3f(1,1,0);
+
+    for(int i=0; i<MAX; i++)
+    {
+        if (devoTestar)   // Esta variável é controlada pela "tecla de espaço"
+        {
+            temp.set(Linhas[i].x1, Linhas[i].y1);
+            InstanciaPonto(temp, PA);
+            temp.set(Linhas[i].x2, Linhas[i].y2);
+            InstanciaPonto(temp, PB);
+            if (HaInterseccao(PA, PB, P1, P2))
+                glColor3f(1,0,0);
+            else glColor3f(0,1,0);
+        }
+        else glColor3f(0,1,0);
+        if (devoExibir) // Esta variável é controlada pela 'e'
+            Linhas[i].desenhaLinha();
+    }
+
+    // Desenha o veículo de novo
+    glColor3f(1,0,1);
+    glLineWidth(3);
+    glPushMatrix();
+    {
+        glTranslatef(tx, ty, 0);
+        glRotatef(alfa,0,0,1);
+        Veiculo.desenhaLinha();
+    }
+    glPopMatrix();
+
+}
 
 //DISPLAY
 void display( void )
@@ -293,7 +343,10 @@ void display( void )
     {
         base_time = glutGet(GLUT_ELAPSED_TIME);
         for (int i=0; i< QTD_FRAMES;i++) // Repete o desenho do cenario
-            DesenhaCenario();
+            //-----------------------
+            //DesenhaCenarioOtimizado();
+            DesenhaCenarioNaoOtimizado();
+            //-----------------------
         new_time = glutGet(GLUT_ELAPSED_TIME);
         float fps;
         fps = QTD_FRAMES/(new_time - base_time);
@@ -301,7 +354,12 @@ void display( void )
         devoImprimirFPS = false;
     }
 
-    else DesenhaCenario();
+    else{
+        //-----------------------
+        //DesenhaCenarioOtimizado();
+        DesenhaCenarioNaoOtimizado();
+        //-----------------------
+    }
     glutSwapBuffers();
 }
 
